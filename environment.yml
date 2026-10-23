@@ -1,4 +1,4 @@
-name: frostbyte
+name: frostbyte_mpm
 channels:
   - conda-forge
   - defaults
@@ -6,5 +6,9 @@ dependencies:
   - python=3.12
   - pip
   - pip:
-    - torch
     - genesis-world
+    - open3d
+    - polyscope
+    - tqdm
+    - pandas
+    - numpy
