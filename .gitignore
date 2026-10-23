@@ -1,10 +1,9 @@
-# Ignore compiled Project Chrono source and builds
-chrono/
-build/
-
-# Ignore Python caches & environment files
 __pycache__/
 *.pyc
 .DS_Store
 .vscode/
 EOT
+
+output/
+.polyscope.ini
+imgui.ini

@@ -1,11 +1,10 @@
-name: chrono
+name: frostbyte
 channels:
   - conda-forge
   - defaults
 dependencies:
   - python=3.12
-  - numpy
-  - scipy
-  - matplotlib
-  - pyyaml
   - pip
+  - pip:
+    - torch
+    - genesis-world

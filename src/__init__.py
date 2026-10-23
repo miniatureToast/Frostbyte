@@ -1,7 +1,4 @@
-import os
+import genesis as gs
 
-# SCMTerrain bugged rn on mac, ONLY USE 1 THREAD
-# os.environ["OMP_NUM_THREADS"] = "1"
-
-# Granular phys not bugged
-os.environ["OMP_NUM_THREADS"] = "8"
+# Set logging_level to "warning" or "error" to silence the [INFO] spam
+gs.init(backend=gs.metal, logging_level="warning")

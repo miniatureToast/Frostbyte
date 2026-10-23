@@ -1,31 +1,36 @@
-# System Physics
-TIME_STEP = 1e-3
-GRAVITY = -9.81
-SETTLE_TIME = 0.4        # Seconds to let snow pack before applying horizontal plow force
+import os
 
-# Terrain Trough Dimensions (Matches the rectangular channel in the video)
-TROUGH_LENGTH_X = 3.0    # meters (along X plowing direction)
-TROUGH_WIDTH_Y = 1.2     # meters (narrower Y width concentrates particles in the path)
-WALL_HEIGHT = 0.4        # Containment wall height
+# --- NEW DIRECTORY STRUCTURE ---
+OUTPUT_DIR = "output"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Granular Snow Parameters (High-Cohesion Packed Snow)
-SNOW_RADIUS = 0.028
-SNOW_DENSITY = 350
-SNOW_LAYERS = 5
+# Export Settings for Visualization
+EXPORT_DIR = os.path.join(OUTPUT_DIR, "frames")
+os.makedirs(EXPORT_DIR, exist_ok=True)
+# -------------------------------
 
-SNOW_FRICTION = 0.9          # Sliding friction
-SNOW_ROLLING_FRICTION = 0.015 # CRITICAL: Stops spheres from rolling like marbles
-SNOW_SPINNING_FRICTION = 0.015 # CRITICAL: Locks particle clumps together in shear
-SNOW_RESTITUTION = 0.0       # Zero bounce
-SNOW_COHESION = 1.5          # Normal adhesion force (N) to hold vertical rut walls
-SNOW_YOUNG_MODULUS = 2e5     # Soft, compressible snow stiffness (Pa)
-SNOW_POISSON_RATIO = 0.3
+# 1. Increase substeps for MPM stability (This stops math explosions)
+DT = 1e-2
+SUBSTEPS = 25  
+GRAVITY = (0.0, 0.0, -9.81)
 
-SPAWN_JITTER = 0.002
-SPAWN_SPACING_MULT = 2.15    # Tighter initial spacing for faster packing
+# 2. Expand the left MPM boundary so we have room to move the plow back
+MPM_LOWER_BOUND = (-1.6, -0.6, -0.15) 
+MPM_UPPER_BOUND = (1.3, 0.6, 0.5)      
+GRID_DENSITY = 32
 
-# Test Box / Plow Payload Parameters
-TEST_MASS = 250              # Tuned so it sinks realistically without bottoming out instantly
-TEST_DIMS = (0.5, 0.6, 0.4)  # (X-length, Y-width, Z-height)
-DROP_HEIGHT = 0.45           # Spawns just above the snow surface
-PUSH_FORCE = 1800            # Horizontal bulldozing force (N)
+# Terrain & Snow Parameters (MPM Elasto-Plastic)
+SNOW_YOUNG_MODULUS = 1e5    # Soft, packable snow
+SNOW_POISSON_RATIO = 0.2
+SNOW_DENSITY = 350.0
+
+# Snow Bed Geometry
+SNOW_POS = (0.0, 0.0, 0.12)
+SNOW_SIZE = (2.0, 0.8, 0.20)
+
+# Plow Payload Parameters
+PLOW_POS = (-1.25, 0.0, 0.15) # Left face is now at -1.4, right face is at -1.1 (safely away from the -1.0 snow)
+PLOW_SIZE = (0.3, 0.5, 0.25)
+PLOW_MASS = 400.0           
+PLOW_FRICTION = 0.4
+PLOW_VELOCITY = [0.6, 0.0, 0.0, 0.0, 0.0, 0.0]  # Move right at 0.6 m/s
