@@ -1,26 +1,26 @@
 import pychrono as chrono
 from . import config
-
-import pychrono as chrono
-from . import config
+from .terrain import create_snow_material
 
 def build_test_box(sys):
-    """Drops a test payload and pushes it sideways to simulate plowing."""
-    box_mat = chrono.ChContactMaterialSMC()
-    w, l, h = config.TEST_DIMS
+    """Spawns the test plow box at the start of the trough."""
+    box_mat = create_snow_material()
+    box_mat.SetAdhesion(0.0) # Prevent snow from permanently gluing to the top of the box
     
+    w, l, h = config.TEST_DIMS
     test_box = chrono.ChBodyEasyBox(w, l, h, config.TEST_MASS, True, True, box_mat)
     
-    # Spawn at the left edge (-1.5 on X axis) and lower the drop height
-    test_box.SetPos(chrono.ChVector3d(-1.5, 0, config.DROP_HEIGHT))
+    # Spawn near the negative-X end of the trough
+    start_x = -(config.TROUGH_LENGTH_X / 2.0) + (w / 2.0) + 0.15
+    test_box.SetPos(chrono.ChVector3d(start_x, 0, config.DROP_HEIGHT))
     sys.Add(test_box)
     
-    # Add a continuous horizontal force to simulate a bulldozer driving forward
+    # Create horizontal thruster (starts at 0 N until snow settles)
     plow_force = chrono.ChForce()
     test_box.AddForce(plow_force)
     plow_force.SetMode(chrono.ChForce.FORCE)
-    plow_force.SetAlign(chrono.ChForce.WORLD_DIR) # Always push strictly along global X
-    plow_force.SetDir(chrono.ChVector3d(1, 0, 0)) # Positive X direction
-    plow_force.SetMforce(config.PUSH_FORCE)       # Apply the thrust we set in config
+    plow_force.SetAlign(chrono.ChForce.WORLD_DIR)
+    plow_force.SetDir(chrono.ChVector3d(1, 0, 0))
+    plow_force.SetMforce(0.0)
     
-    return test_box
+    return test_box, plow_force
