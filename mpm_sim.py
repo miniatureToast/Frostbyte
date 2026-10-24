@@ -18,19 +18,18 @@ scene = gs.Scene(
         upper_bound=config.MPM_UPPER_BOUND,
         grid_density=config.GRID_DENSITY,
     ),
-    show_viewer=False, # Keep headless for max speed
+    show_viewer=False,
 )
 
 snow_bed = terrain.build_environment(scene)
 plow = robot.build_plow(scene)
 scene.build()
 
-# ... (previous code) ...
 print("Starting Headless Plowing with Frame Baking...")
 start_time = time.time()
 frame_idx = 0 
 
-# ---> UPDATE THESE TWO PATHS <---
+# export location for baked outputs
 telemetry_path = os.path.join(config.OUTPUT_DIR, "plow_telemetry.csv")
 positions_path = os.path.join(config.OUTPUT_DIR, "plow_positions.csv")
 
@@ -38,7 +37,6 @@ with open(telemetry_path, mode="w", newline="") as telemetry_file, \
      open(positions_path, mode="w", newline="") as pos_file:
      
     telemetry_writer = csv.writer(telemetry_file)
-    # ... (the rest of the script remains exactly the same)
     telemetry_writer.writerow(["Step", "Time (s)", "Plow Resistance Force X (N)"])
     
     pos_writer = csv.writer(pos_file)
@@ -53,14 +51,14 @@ with open(telemetry_path, mode="w", newline="") as telemetry_file, \
         
         # Export Visual Frames
         if step % 5 == 0:
-            # 1. Save Snow Points (This part still works perfectly)
+            # 1. Save Snow Points
             snow_path = os.path.join(config.EXPORT_DIR, f"snow_{frame_idx:04d}.ply")
             points = snow_bed.get_particles_pos().cpu().numpy()
             pcd = o3d.geometry.PointCloud()
             pcd.points = o3d.utility.Vector3dVector(points)
             o3d.io.write_point_cloud(snow_path, pcd)
             
-            # 2. Save Plow Position (Replacing the broken export_mesh)
+            # 2. Save Plow Position
             # get_pos() returns an array like [X, Y, Z]
             plow_pos = plow.get_pos().cpu().numpy()
             pos_writer.writerow([frame_idx, plow_pos[0], plow_pos[1], plow_pos[2]])

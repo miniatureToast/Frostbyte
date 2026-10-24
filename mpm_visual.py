@@ -2,13 +2,13 @@ import polyscope as ps
 import polyscope.imgui as psim
 import glob
 import open3d as o3d 
-import pandas as pd # pip install pandas (easier CSV reading)
+import pandas as pd 
 import numpy as np
 
 ps.init()
 ps.set_up_dir("z_up") 
 
-# ---> UPDATE THESE TWO PATHS <---
+# baked output file paths
 snow_files = sorted(glob.glob("output/frames/snow_*.ply"))
 plow_data = pd.read_csv("output/plow_positions.csv")
 
@@ -29,7 +29,7 @@ def update_frame():
     # Draw the Plow using the logged position
     current_pos = plow_data.iloc[frame_idx][["X", "Y", "Z"]].values
     
-    # To draw a box in Polyscope, we define its 8 corners relative to its center
+    # Define test box using 8 corners relative to its center
     half_extents = PLOW_SIZE / 2.0
     min_bounds = current_pos - half_extents
     max_bounds = current_pos + half_extents
@@ -53,7 +53,7 @@ def update_frame():
         [0, 4], [1, 5], [2, 6], [3, 7]  # Vertical edges connecting top to bottom
     ])
     
-    # Register it as a wireframe curve network so we can see the snow pushing against it
+    # Register as wireframe curve network
     ps.register_curve_network("Plow Wireframe", nodes, edges, radius=0.003, color=(1.0, 0.5, 0.0))
     
 def callback():

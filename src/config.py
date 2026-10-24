@@ -1,15 +1,15 @@
 import os
 
-# --- NEW DIRECTORY STRUCTURE ---
+# define output directory
 OUTPUT_DIR = "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Export Settings for Visualization
+# define export directory
 EXPORT_DIR = os.path.join(OUTPUT_DIR, "frames")
 os.makedirs(EXPORT_DIR, exist_ok=True)
 # -------------------------------
 
-# 1. Increase substeps for MPM stability (This stops math explosions)
+# 1. Increase substeps for MPM stability
 DT = 1e-2
 SUBSTEPS = 25  
 GRAVITY = (0.0, 0.0, -9.81)
@@ -19,7 +19,7 @@ MPM_LOWER_BOUND = (-1.6, -0.6, -0.15)
 MPM_UPPER_BOUND = (1.3, 0.6, 0.5)      
 GRID_DENSITY = 32
 
-# Terrain & Snow Parameters (MPM Elasto-Plastic)
+# Terrain & Snow Parameters
 SNOW_YOUNG_MODULUS = 1e5    # Soft, packable snow
 SNOW_POISSON_RATIO = 0.2
 SNOW_DENSITY = 350.0
