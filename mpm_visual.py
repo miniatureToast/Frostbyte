@@ -9,6 +9,9 @@ import trimesh # <--- NEW IMPORT
 ps.init()
 ps.set_up_dir("z_up")
 
+ps.set_automatically_center_zoom(False)  # Stops Polyscope from hijacking your zoom
+ps.set_navigation_style("free")          # Keeps camera movement smooth and stable
+
 snow_files = sorted(glob.glob("output/frames/snow_*.ply")) # or mpm_output_frames
 plow_data = pd.read_csv("output/plow_positions.csv")
 

@@ -42,7 +42,7 @@ with open(telemetry_path, mode="w", newline="") as telemetry_file, \
     pos_writer = csv.writer(pos_file)
     pos_writer.writerow(["Frame", "X", "Y", "Z"])
     
-    for step in tqdm(range(1500), desc="Baking Frames", unit="step"):
+    for step in tqdm(range(config.STEPS_COUNT), desc="Baking Frames", unit="step"):
         
         if step > 50:
             plow.set_dofs_velocity(config.PLOW_VELOCITY)
