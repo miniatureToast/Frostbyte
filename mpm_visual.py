@@ -4,15 +4,20 @@ import glob
 import open3d as o3d 
 import pandas as pd 
 import numpy as np
+import trimesh # <--- NEW IMPORT
 
 ps.init()
-ps.set_up_dir("z_up") 
+ps.set_up_dir("z_up")
 
-# baked output file paths
-snow_files = sorted(glob.glob("output/frames/snow_*.ply"))
+snow_files = sorted(glob.glob("output/frames/snow_*.ply")) # or mpm_output_frames
 plow_data = pd.read_csv("output/plow_positions.csv")
 
-PLOW_SIZE = np.array([0.3, 0.5, 0.25])
+# Load the CAD mesh using Trimesh
+mesh = trimesh.load("assets/frosty_v3_sim.obj", force='mesh')
+
+# Register the properly sized CAD model into Polyscope
+ps_robot = ps.register_surface_mesh("Robot", mesh.vertices, mesh.faces, color=(1.0, 0.5, 0.0))
+ps_robot.set_edge_width(1.0)
 
 frame_idx = 0
 playing = False
@@ -22,39 +27,19 @@ def update_frame():
     if frame_idx >= len(snow_files):
         frame_idx = 0
         
-    # Load Snow Point Cloud
+    # 1. Update the Snow Point Cloud
     pcd = o3d.io.read_point_cloud(snow_files[frame_idx])
     ps.register_point_cloud("Snow", np.asarray(pcd.points), radius=0.005, color=(0.92, 0.96, 1.0))
     
-    # Draw the Plow using the logged position
+    # 2. Update the CAD Model's Position
+    # Grab the current X,Y,Z from the CSV
     current_pos = plow_data.iloc[frame_idx][["X", "Y", "Z"]].values
     
-    # Define test box using 8 corners relative to its center
-    half_extents = PLOW_SIZE / 2.0
-    min_bounds = current_pos - half_extents
-    max_bounds = current_pos + half_extents
-    
-    # Define the 8 corners of the bounding box
-    nodes = np.array([
-        [min_bounds[0], min_bounds[1], min_bounds[2]],
-        [max_bounds[0], min_bounds[1], min_bounds[2]],
-        [max_bounds[0], max_bounds[1], min_bounds[2]],
-        [min_bounds[0], max_bounds[1], min_bounds[2]],
-        [min_bounds[0], min_bounds[1], max_bounds[2]],
-        [max_bounds[0], min_bounds[1], max_bounds[2]],
-        [max_bounds[0], max_bounds[1], max_bounds[2]],
-        [min_bounds[0], max_bounds[1], max_bounds[2]]
-    ])
-    
-    # Define the 12 edges connecting the corners
-    edges = np.array([
-        [0, 1], [1, 2], [2, 3], [3, 0], # Bottom face edges
-        [4, 5], [5, 6], [6, 7], [7, 4], # Top face edges
-        [0, 4], [1, 5], [2, 6], [3, 7]  # Vertical edges connecting top to bottom
-    ])
-    
-    # Register as wireframe curve network
-    ps.register_curve_network("Plow Wireframe", nodes, edges, radius=0.003, color=(1.0, 0.5, 0.0))
+    # We update the internal transformation matrix to move the mesh!
+    # (Since it was centered at 0,0,0 in Blender, adding the current_pos places it perfectly)
+    transform = np.eye(4)
+    transform[0:3, 3] = current_pos
+    ps_robot.set_transform(transform)
     
 def callback():
     global frame_idx, playing

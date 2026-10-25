@@ -14,9 +14,8 @@ DT = 1e-2
 SUBSTEPS = 25  
 GRAVITY = (0.0, 0.0, -9.81)
 
-# 2. Expand the left MPM boundary so we have room to move the plow back
-MPM_LOWER_BOUND = (-1.6, -0.6, -0.15) 
-MPM_UPPER_BOUND = (1.3, 0.6, 0.5)      
+MPM_LOWER_BOUND = (-5.0, -0.55, -0.2) 
+MPM_UPPER_BOUND = (5.0, 0.55, 1.5)
 GRID_DENSITY = 32
 
 # Terrain & Snow Parameters
@@ -28,9 +27,9 @@ SNOW_DENSITY = 350.0
 SNOW_POS = (0.0, 0.0, 0.12)
 SNOW_SIZE = (2.0, 0.8, 0.20)
 
-# Plow Payload Parameters
-PLOW_POS = (-1.25, 0.0, 0.15) # Left face is now at -1.4, right face is at -1.1 (safely away from the -1.0 snow)
+# Robot Payload Parameters
+PLOW_POS = (-1.6, 0.0, 0.0)
 PLOW_SIZE = (0.3, 0.5, 0.25)
-PLOW_MASS = 400.0           
+PLOW_MASS = 20.5           
 PLOW_FRICTION = 0.4
-PLOW_VELOCITY = [0.6, 0.0, 0.0, 0.0, 0.0, 0.0]  # Move right at 0.6 m/s
+PLOW_VELOCITY = (0.5, 0.0, 0.0, 0.0, 0.0, 0.0)

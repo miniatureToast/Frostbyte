@@ -2,20 +2,20 @@ import genesis as gs
 from . import config
 
 def build_plow(scene):
-    """Adds the rigid plow test box to the scene."""
-    
     plow = scene.add_entity(
         material=gs.materials.Rigid(
             rho=config.PLOW_MASS, 
             friction=config.PLOW_FRICTION
         ),
-        morph=gs.morphs.Box(
-            pos=config.PLOW_POS,
-            size=config.PLOW_SIZE,
+        # --> Make sure this 'morph=' section is intact! <--
+        morph=gs.morphs.Mesh(
+            file="assets/frosty_v3_sim.obj",
+            pos=config.PLOW_POS, 
+            scale=1.0, 
+            collision=True, 
         ),
         surface=gs.surfaces.Default(
-            color=(0.2, 0.2, 0.25, 1.0)
+            color=(0.5, 0.5, 0.55, 1.0)
         ),
     )
-    
     return plow
