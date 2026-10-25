@@ -12,7 +12,7 @@ os.makedirs(EXPORT_DIR, exist_ok=True)
 # --- TEMPORAL SCALING (Real-World Proportions) ---
 DT = 5e-3        # Smaller base time step for finer calculations
 SUBSTEPS = 40    # High substeps so gravity and collisions have time to resolve smoothly
-STEPS_COUNT = 4500
+STEPS_COUNT = 2250
 GRAVITY = (0.0, 0.0, -9.81)
 
 MPM_LOWER_BOUND = (-5.0, -2.0, -0.2) 
