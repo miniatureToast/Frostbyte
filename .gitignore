@@ -7,3 +7,6 @@ EOT
 output/
 .polyscope.ini
 imgui.ini
+
+assets/
+frosty_v2_sim.obj
