@@ -10,7 +10,7 @@ os.makedirs(EXPORT_DIR, exist_ok=True)
 # -------------------------------
 
 # Time stepping
-DT = 5e-3           # Step interval (sec)
+DT = 2e-3           # Step interval (sec)
 SUBSTEPS = 40       # Num of calcs per step
 STEPS_COUNT = 1500  # Total steps
 FRAME_INTERVAL = 5  # N steps per frame
