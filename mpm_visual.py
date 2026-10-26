@@ -16,7 +16,7 @@ plow_data = pd.read_csv("output/plow_positions.csv")
 print(f"Found {len(snow_files)} snow frames!")
 
 # 2. Load and register the Robot mesh ONCE
-mesh = trimesh.load("assets/frosty_v3_sim.obj", force='mesh')
+mesh = trimesh.load(config.PLOW_FILE, force='mesh')
 ps_robot = ps.register_surface_mesh("Robot", mesh.vertices, mesh.faces, color=(1.0, 0.5, 0.0))
 ps_robot.set_edge_width(1.0)
 
@@ -58,8 +58,7 @@ def update_frame():
 def callback():
     global frame_idx, playing
     
-    save_interval = 5  
-    sim_time = frame_idx * config.DT * save_interval
+    sim_time = frame_idx * config.DT * config.FRAME_INTERVAL
     
     psim.Text(f"Frame: {frame_idx} / {len(snow_files) - 1}")
     psim.Text(f"Time: {sim_time:.2f} seconds")

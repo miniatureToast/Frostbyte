@@ -43,7 +43,11 @@ with open(telemetry_path, mode="w", newline="") as telemetry_file, \
      open(positions_path, mode="w", newline="") as pos_file:
      
     telemetry_writer = csv.writer(telemetry_file)
-    telemetry_writer.writerow(["Step", "Time (s)", "Plow Resistance Force X (N)"])
+    telemetry_writer.writerow([
+        "Step", "Time (s)", 
+        "Force_X (N)", "Force_Y (N)", "Force_Z (N)", 
+        "Torque_Roll (Nm)", "Torque_Pitch (Nm)", "Torque_Yaw (Nm)"
+    ])
     
     pos_writer = csv.writer(pos_file)
     pos_writer.writerow(["Frame", "X", "Y", "Z"])
@@ -56,7 +60,7 @@ with open(telemetry_path, mode="w", newline="") as telemetry_file, \
         scene.step()
         
         # Export Visual Frames
-        if step % 5 == 0:
+        if step % config.FRAME_INTERVAL == 0:
             # 1. Save Snow Points
             snow_path = os.path.join(config.EXPORT_DIR, f"snow_{frame_idx:04d}.ply")
             points = snow_bed.get_particles_pos().cpu().numpy()
@@ -71,10 +75,15 @@ with open(telemetry_path, mode="w", newline="") as telemetry_file, \
             
             frame_idx += 1
         
-        # Log Telemetry
+        # Log Full 6-DoF Telemetry
         if step % 10 == 0:
-            resistance_force = -plow.get_dofs_force()[0].item() 
+            # Invert forces to represent the resistance load applied BY the snow ON the plow
+            forces = -plow.get_dofs_force().cpu().numpy()
             sim_time = step * config.DT
-            telemetry_writer.writerow([step, f"{sim_time:.3f}", f"{resistance_force:.2f}"])
-
+            telemetry_writer.writerow([
+                step, f"{sim_time:.3f}",
+                f"{forces[0]:.2f}", f"{forces[1]:.2f}", f"{forces[2]:.2f}",
+                f"{forces[3]:.2f}", f"{forces[4]:.2f}", f"{forces[5]:.2f}"
+            ])
+            
 print(f"\nSimulation Baked in {time.time() - start_time:.1f} seconds.")
