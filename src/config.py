@@ -38,7 +38,7 @@ SNOW_POISSON_RATIO = 0.2
 SNOW_DENSITY = 50.0
 
 # --- ROBOT --- 
-PLOW_FILE = "assets/frosty_v3_sim.obj"
+PLOW_FILE = "assets/frosty_v2_sim.obj"
 
 PLOW_POS = (-0.9, 0.0, 0.0)
 PLOW_SIZE = (0.3, 0.5, 0.25)
