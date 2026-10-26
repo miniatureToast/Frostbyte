@@ -4,7 +4,7 @@ from . import config
 def build_plow(scene):
     plow = scene.add_entity(
         material=gs.materials.Rigid(
-            rho=config.PLOW_MASS, 
+            rho=config.PLOW_DENSITY, 
             friction=config.PLOW_FRICTION
         ),
         # --> Make sure this 'morph=' section is intact! <--

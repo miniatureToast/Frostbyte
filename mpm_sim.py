@@ -5,7 +5,13 @@ import csv
 import time
 import os
 import open3d as o3d
+import glob
 from tqdm import tqdm
+
+print("Clearing old simulation frames...")
+old_frames = glob.glob(os.path.join(config.EXPORT_DIR, "*"))
+for f in old_frames:
+    os.remove(f)
 
 scene = gs.Scene(
     sim_options=gs.options.SimOptions(
