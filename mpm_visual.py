@@ -33,7 +33,7 @@ ps_anchor.set_transparency(0.0) # Completely invisible, purely acts as a spatial
 initial_pcd = o3d.io.read_point_cloud(snow_files[0])
 initial_points = np.asarray(initial_pcd.points)
 ps_snow = ps.register_point_cloud("Snow", initial_points, color=(0.92, 0.96, 1.0))
-ps_snow.set_radius(0.003, relative=False)  # Lock physical world size
+ps_snow.set_radius(0.005, relative=False)
 
 frame_idx = 0
 playing = False
@@ -52,6 +52,16 @@ def update_frame():
     # Update Robot Position from CSV
     current_pos = plow_data.iloc[frame_idx][["X", "Y", "Z"]].values
     transform = np.eye(4)
+
+    #TEMPORAORY
+    # NEW: Apply a 90-degree rotation around the Z-axis!
+    # (If it faces away from the snow, just swap the 1.0 and -1.0)
+    transform[0:3, 0:3] = np.array([
+        [ 0.0, -1.0,  0.0],
+        [ 1.0,  0.0,  0.0],
+        [ 0.0,  0.0,  1.0]
+    ])
+
     transform[0:3, 3] = current_pos
     ps_robot.set_transform(transform)
 

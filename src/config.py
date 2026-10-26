@@ -19,11 +19,11 @@ FRAME_INTERVAL = 5  # N steps per frame
 MPM_LOWER_BOUND = (-2.0, -2.0, -0.2) 
 MPM_UPPER_BOUND = (0.6, 2.0, 1.5)
 GRAVITY = (0.0, 0.0, -9.81)    
-GRID_DENSITY = 40
+GRID_DENSITY = 35
 
 # Snow Geometry
 SNOW_POS = (0.0, 0.0, 0.1)
-SNOW_SIZE = (1.0, 0.5, 0.2)
+SNOW_SIZE = (1.0, 1.5, 0.2)
 
 # --- SNOW MATERIAL ---
 
@@ -40,7 +40,7 @@ SNOW_POISSON_RATIO = 0.2
 SNOW_DENSITY = 50.0
 
 # Robot
-PLOW_FILE = "assets/frosty_v3_sim.obj"
+PLOW_FILE = "assets/frosty_v2_sim.obj"
 
 PLOW_POS = (-0.9, 0.0, 0.0)
 PLOW_SIZE = (0.3, 0.5, 0.25)
