@@ -4,9 +4,8 @@ __pycache__/
 .vscode/
 EOT
 
+assets/frosty_v2_sim.obj
+
 output/
 .polyscope.ini
 imgui.ini
-
-assets/
-frosty_v2_sim.obj
