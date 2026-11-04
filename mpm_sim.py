@@ -54,8 +54,17 @@ with open(telemetry_path, mode="w", newline="") as telemetry_file, \
     
     for step in tqdm(range(config.STEPS_COUNT), desc="Baking Frames", unit="step"):
         
-        if step > 50:
-            plow.set_dofs_velocity(config.PLOW_VELOCITY)
+        # if step > 50:
+        current_vel = plow.get_dofs_velocity()
+
+        current_vel[0] = config.PLOW_VELOCITY if step > 50 else 0.0  # X
+        current_vel[1] = 0.0  # Y (No sideways drift)
+        current_vel[2] = 0.0  # Z (No vertical lift/drop)
+        current_vel[3] = 0.0  # Roll (No tipping)
+        current_vel[4] = 0.0  # Pitch (No tilting back)
+        current_vel[5] = 0.0  # Yaw (No spinning)
+        
+        plow.set_dofs_velocity(current_vel)
             
         scene.step()
         
@@ -85,5 +94,5 @@ with open(telemetry_path, mode="w", newline="") as telemetry_file, \
                 f"{forces[0]:.2f}", f"{forces[1]:.2f}", f"{forces[2]:.2f}",
                 f"{forces[3]:.2f}", f"{forces[4]:.2f}", f"{forces[5]:.2f}"
             ])
-            
+
 print(f"\nSimulation Baked in {time.time() - start_time:.1f} seconds.")

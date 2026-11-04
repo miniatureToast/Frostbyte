@@ -7,7 +7,7 @@ def build_environment(scene):
     # 1. Solid Ground Plane
     scene.add_entity(
         morph=gs.morphs.Plane(),
-        material=gs.materials.Rigid(friction=0.9),
+        material=gs.materials.Rigid(friction=config.TERRAIN_FRICTION),
     )
 
     # 2. Elasto-Plastic MPM Snow Bed

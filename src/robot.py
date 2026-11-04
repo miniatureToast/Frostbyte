@@ -6,6 +6,7 @@ def build_plow(scene):
         robot_morph = gs.morphs.URDF(
             file=config.PLOW_FILE,
             pos=config.PLOW_POS,
+            euler=(0.0, 0.0, 90.0), # rotation fix
             scale=1.0,
             collision=True,
         )
@@ -13,6 +14,7 @@ def build_plow(scene):
         robot_morph = gs.morphs.Mesh(
             file=config.PLOW_FILE,
             pos=config.PLOW_POS, 
+            euler=(0.0, 0.0, 90.0), # rotation fix
             scale=1.0, 
             collision=True, 
         )
@@ -22,8 +24,7 @@ def build_plow(scene):
             rho=config.PLOW_DENSITY, 
             friction=config.PLOW_FRICTION
         ),
-        # --> Make sure this 'morph=' section is intact! <--
-        morph=robot_morph,
+        morph = robot_morph,
         surface=gs.surfaces.Default(
             color=(0.5, 0.5, 0.55, 1.0)
         ),

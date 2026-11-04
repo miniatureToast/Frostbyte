@@ -15,6 +15,13 @@ snow_files = sorted(glob.glob("output/frames/snow_*.ply"))
 plow_data = pd.read_csv("output/plow_positions.csv")
 print(f"Found {len(snow_files)} snow frames!")
 
+# ---> NEW: AUTOMATIC COM SYNC <---
+# Compare Frame 0's physical COM to the config spawn origin.
+# This finds the exact offset for ANY plow geometry automatically!
+frame_0_pos = plow_data.iloc[0][["X", "Y", "Z"]].values
+spawn_pos = np.array(config.PLOW_POS)
+auto_com_offset = frame_0_pos - spawn_pos
+
 # 2. Load and register the Robot mesh ONCE
 mesh = trimesh.load(config.PLOW_FILE, force='mesh')
 ps_robot = ps.register_surface_mesh("Robot", mesh.vertices, mesh.faces, color=(1.0, 0.5, 0.0))
@@ -48,7 +55,25 @@ def update_frame():
     # --- UPDATE POSITIONS IN-PLACE (Stops grid shifting!) ---
     pcd = o3d.io.read_point_cloud(snow_files[frame_idx])
     ps_snow.update_point_positions(np.asarray(pcd.points))
+    points = np.asarray(pcd.points)
+
+    # nn_dists = np.asarray(pcd.compute_nearest_neighbor_distance())
     
+    # # Invert the distance so smaller distance = higher pressure.
+    # # We use 0.02 (the resting distance for GRID_DENSITY=50) to normalize it!
+    # # Loose snow = ~1.0. Packed snow = 2.0 to 4.0+.
+    # packing_pressure = 0.02 / (nn_dists + 1e-6) 
+    
+    # # Apply the heatmap to the snow in Polyscope!
+    # # 'jet' cmap maps loose snow to Blue, and high-stress packed snow to Red
+    # ps_snow.add_scalar_quantity(
+    #     "Packing Pressure", 
+    #     packing_pressure, 
+    #     enabled=True, 
+    #     cmap='jet', 
+    #     vminmax=(0.8, 2.5) # Locks the color scale so it doesn't flicker (tune as needed!)
+    # )
+
     # Update Robot Position from CSV
     current_pos = plow_data.iloc[frame_idx][["X", "Y", "Z"]].values
     transform = np.eye(4)
@@ -62,7 +87,7 @@ def update_frame():
         [ 0.0,  0.0,  1.0]
     ])
 
-    transform[0:3, 3] = current_pos
+    transform[0:3, 3] = current_pos - auto_com_offset
     ps_robot.set_transform(transform)
 
 def callback():
@@ -89,9 +114,9 @@ def callback():
 ps.set_user_callback(callback)
 update_frame() 
 
-# --- ABSOLUTE CAMERA LOCK (Executed last) ---
+# Camera view
 ps.look_at(
-    camera_location=(-0.0, -2.0, 1.2),  
+    camera_location=(1.7, -1.7, 1.2),  
     target=(0.0, 0.0, 0.2)             
 )
 
