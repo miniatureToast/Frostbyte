@@ -11,3 +11,6 @@ output/
 imgui.ini
 
 .obsidian
+
+CLAUDE.md
+.claudeignore

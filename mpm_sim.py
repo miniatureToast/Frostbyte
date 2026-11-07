@@ -33,7 +33,11 @@ scene.build()
 
 print("Starting Headless Plowing with Frame Baking...")
 start_time = time.time()
-frame_idx = 0 
+frame_idx = 0
+
+# Initialize plow with zero velocity in all directions to prevent unwanted movement
+initial_vel = [0.0] * 6  # [X, Y, Z, Roll, Pitch, Yaw]
+plow.set_dofs_velocity(initial_vel)
 
 # export location for baked outputs
 telemetry_path = os.path.join(config.OUTPUT_DIR, "plow_telemetry.csv")
@@ -41,29 +45,34 @@ positions_path = os.path.join(config.OUTPUT_DIR, "plow_positions.csv")
 
 with open(telemetry_path, mode="w", newline="") as telemetry_file, \
      open(positions_path, mode="w", newline="") as pos_file:
-     
+
     telemetry_writer = csv.writer(telemetry_file)
     telemetry_writer.writerow([
-        "Step", "Time (s)", 
-        "Force_X (N)", "Force_Y (N)", "Force_Z (N)", 
+        "Step", "Time (s)",
+        "Force_X (N)", "Force_Y (N)", "Force_Z (N)",
         "Torque_Roll (Nm)", "Torque_Pitch (Nm)", "Torque_Yaw (Nm)"
     ])
-    
+
     pos_writer = csv.writer(pos_file)
     pos_writer.writerow(["Frame", "X", "Y", "Z"])
-    
-    for step in tqdm(range(config.STEPS_COUNT), desc="Baking Frames", unit="step"):
-        
-        # if step > 50:
-        current_vel = plow.get_dofs_velocity()
 
-        current_vel[0] = config.PLOW_VELOCITY if step > 50 else 0.0  # X
-        current_vel[1] = 0.0  # Y (No sideways drift)
-        current_vel[2] = 0.0  # Z (No vertical lift/drop)
-        current_vel[3] = 0.0  # Roll (No tipping)
-        current_vel[4] = 0.0  # Pitch (No tilting back)
-        current_vel[5] = 0.0  # Yaw (No spinning)
-        
+    # Capture initial spawn position and rotation right after scene.build()
+    locked_pos = plow.get_pos().clone()
+    locked_quat = plow.get_quat().clone()
+
+    for step in tqdm(range(config.STEPS_COUNT), desc="Baking Frames", unit="step"):
+
+        # 1. Hard-reset Y, Z position and 3D orientation so substeps cannot accumulate lift or tilt
+        curr_pos = plow.get_pos().clone()
+        curr_pos[1] = locked_pos[1]  # Lock Y
+        curr_pos[2] = locked_pos[2]  # Lock Z
+        plow.set_pos(curr_pos)
+        plow.set_quat(locked_quat)   # Lock Roll, Pitch, Yaw orientation
+
+        # 2. Enforce strictly forward velocity
+        current_vel = plow.get_dofs_velocity()
+        current_vel[0] = config.PLOW_VELOCITY if step > 50 else 0.0
+        current_vel[1:] = 0.0
         plow.set_dofs_velocity(current_vel)
             
         scene.step()
