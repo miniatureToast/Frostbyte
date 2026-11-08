@@ -24,8 +24,8 @@ GRID_DENSITY = 60
 TERRAIN_FRICTION = 1.2
 
 # --- SNOW  ---
-SNOW_POS = (0.0, 0.0, 0.08)
-SNOW_SIZE = (1.4, 1.6, 0.15) # width should be 2x-3x of plow width
+SNOW_SIZE = (1.4, 1.5, 0.15) # width should be 2x-3x of plow width
+SNOW_POS = (0.0, 0.0, SNOW_SIZE[2] * 0.55)
 
 # STIFFNESS (lower is softer)
 # 1e3 (powder) to 3e4 (compact) to 5e5 (icy)
@@ -40,10 +40,9 @@ SNOW_POISSON_RATIO = 0.12
 SNOW_DENSITY = 150.0
 
 # --- ROBOT --- 
-PLOW_FILE = "assets/plow1.obj"
+PLOW_FILE = "assets/plow5.obj"
 
 PLOW_POS = (-0.9, 0.0, 0.001)
-PLOW_SIZE = (0.3, 0.5, 0.25)
 PLOW_MASS = 20.0 # v3 original: 20.5          
 PLOW_DENSITY = 1e9 # v3: 1937.7
 PLOW_FRICTION = 0.03 
