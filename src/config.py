@@ -40,7 +40,7 @@ SNOW_POISSON_RATIO = 0.12
 SNOW_DENSITY = 150.0
 
 # --- ROBOT --- 
-PLOW_FILE = "assets/plow5.obj"
+PLOW_FILE = "assets/newplow.obj"
 
 PLOW_POS = (-0.9, 0.0, 0.001)
 PLOW_MASS = 20.0 # v3 original: 20.5          

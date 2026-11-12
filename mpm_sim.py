@@ -8,7 +8,7 @@ import open3d as o3d
 import glob
 from tqdm import tqdm
 
-print("Clearing old simulation frames...")
+print("Clearing previous frames...")
 old_frames = glob.glob(os.path.join(config.EXPORT_DIR, "*"))
 for f in old_frames:
     os.remove(f)
@@ -35,11 +35,10 @@ print("Starting Headless Plowing with Frame Baking...")
 start_time = time.time()
 frame_idx = 0
 
-# Initialize plow with zero velocity in all directions to prevent unwanted movement
 initial_vel = [0.0] * 6  # [X, Y, Z, Roll, Pitch, Yaw]
 plow.set_dofs_velocity(initial_vel)
 
-# export location for baked outputs
+# baked frames export directory + telemetry
 telemetry_path = os.path.join(config.OUTPUT_DIR, "plow_telemetry.csv")
 positions_path = os.path.join(config.OUTPUT_DIR, "plow_positions.csv")
 
@@ -56,20 +55,19 @@ with open(telemetry_path, mode="w", newline="") as telemetry_file, \
     pos_writer = csv.writer(pos_file)
     pos_writer.writerow(["Frame", "X", "Y", "Z"])
 
-    # Capture initial spawn position and rotation right after scene.build()
     locked_pos = plow.get_pos().clone()
     locked_quat = plow.get_quat().clone()
 
     for step in tqdm(range(config.STEPS_COUNT), desc="Baking Frames", unit="step"):
 
-        # 1. Hard-reset Y, Z position and 3D orientation so substeps cannot accumulate lift or tilt
+        # force y/z position and orientation
         curr_pos = plow.get_pos().clone()
         curr_pos[1] = locked_pos[1]  # Lock Y
         curr_pos[2] = locked_pos[2]  # Lock Z
         plow.set_pos(curr_pos)
         plow.set_quat(locked_quat)   # Lock Roll, Pitch, Yaw orientation
 
-        # 2. Enforce strictly forward velocity
+        # force x-velocity only
         current_vel = plow.get_dofs_velocity()
         current_vel[0] = config.PLOW_VELOCITY if step > 50 else 0.0
         current_vel[1:] = 0.0
@@ -77,25 +75,23 @@ with open(telemetry_path, mode="w", newline="") as telemetry_file, \
             
         scene.step()
         
-        # Export Visual Frames
+        # export frames
         if step % config.FRAME_INTERVAL == 0:
-            # 1. Save Snow Points
+            # save snow particles
             snow_path = os.path.join(config.EXPORT_DIR, f"snow_{frame_idx:04d}.ply")
             points = snow_bed.get_particles_pos().cpu().numpy()
             pcd = o3d.geometry.PointCloud()
             pcd.points = o3d.utility.Vector3dVector(points)
             o3d.io.write_point_cloud(snow_path, pcd)
             
-            # 2. Save Plow Position
-            # get_pos() returns an array like [X, Y, Z]
+            # save plow pos
             plow_pos = plow.get_pos().cpu().numpy()
             pos_writer.writerow([frame_idx, plow_pos[0], plow_pos[1], plow_pos[2]])
             
             frame_idx += 1
         
-        # Log Full 6-DoF Telemetry
+        # log telemetry (unused rn)
         if step % 10 == 0:
-            # Invert forces to represent the resistance load applied BY the snow ON the plow
             forces = -plow.get_dofs_force().cpu().numpy()
             sim_time = step * config.DT
             telemetry_writer.writerow([

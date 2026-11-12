@@ -1,16 +1,17 @@
 import genesis as gs
 from . import config
 
+# init sim environment and objects
 def build_environment(scene):
     """Adds the solid ground and MPM snow bed to the scene."""
     
-    # 1. Solid Ground Plane
+    # solid ground plane
     scene.add_entity(
         morph=gs.morphs.Plane(),
         material=gs.materials.Rigid(friction=config.TERRAIN_FRICTION),
     )
 
-    # 2. Elasto-Plastic MPM Snow Bed
+    # mpm snow point-cloud
     snow_bed = scene.add_entity(
         material=gs.materials.MPM.Snow(
             E=config.SNOW_YOUNG_MODULUS,             

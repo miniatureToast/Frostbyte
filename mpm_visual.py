@@ -9,33 +9,26 @@ import trimesh
 
 ps.init()
 ps.set_up_dir("z_up")
+ps.set_front_dir("x_front")
 
-# 1. Load file paths
 snow_files = sorted(glob.glob("output/frames/snow_*.ply"))
 plow_data = pd.read_csv("output/plow_positions.csv")
 print(f"Found {len(snow_files)} snow frames!")
 
-# ---> NEW: AUTOMATIC COM SYNC <---
-# Compare Frame 0's physical COM to the config spawn origin.
-# This finds the exact offset for ANY plow geometry automatically!
 frame_0_pos = plow_data.iloc[0][["X", "Y", "Z"]].values
 spawn_pos = np.array(config.PLOW_POS)
 
-# 2. Load and register the Robot mesh ONCE
+# load obj mesh
 mesh = trimesh.load(config.PLOW_FILE, force='mesh')
 ps_robot = ps.register_surface_mesh("Robot", mesh.vertices, mesh.faces, color=(1.0, 0.5, 0.0))
 ps_robot.set_edge_width(1.0)
 
-# --- ANCHOR THE WORLD ORIGIN ---
-# Register a tiny, invisible or subtle bounding box right where the snow starts (0,0,0).
-# This forces Polyscope's bounding-box center to stay permanently locked at the origin, 
-# preventing the floor grid from drifting when the robot moves!
 anchor_box = trimesh.creation.box(extents=[0.01, 0.01, 0.01])
 anchor_box.apply_translation([0.0, 0.0, 0.0])
 ps_anchor = ps.register_surface_mesh("WorldAnchor", anchor_box.vertices, anchor_box.faces)
 ps_anchor.set_transparency(0.0) # Completely invisible, purely acts as a spatial anchor!
 
-# 3. Register the Snow Point Cloud ONCE using the first frame
+# register snow point-cloud
 initial_pcd = o3d.io.read_point_cloud(snow_files[0])
 initial_points = np.asarray(initial_pcd.points)
 ps_snow = ps.register_point_cloud("Snow", initial_points, color=(0.92, 0.96, 1.0))
@@ -51,18 +44,16 @@ def update_frame():
     if frame_idx < 0:
         frame_idx = len(snow_files) - 1
         
-    # --- UPDATE POSITIONS IN-PLACE (Stops grid shifting!) ---
     pcd = o3d.io.read_point_cloud(snow_files[frame_idx])
     ps_snow.update_point_positions(np.asarray(pcd.points))
     points = np.asarray(pcd.points)
 
-    # Update Robot Position from CSV
+    # update obj pos from baked frames
     current_pos = plow_data.iloc[frame_idx][["X", "Y", "Z"]].values
     transform = np.eye(4)
 
-    #TEMPORAORY
-    # NEW: Apply a 90-degree rotation around the Z-axis!
-    # (If it faces away from the snow, just swap the 1.0 and -1.0)
+    # TEMPORAORY
+    # apply 90-deg rotation
     transform[0:3, 0:3] = np.array([
         [ 0.0, -1.0,  0.0],
         [ 1.0,  0.0,  0.0],
@@ -96,7 +87,7 @@ def callback():
 ps.set_user_callback(callback)
 update_frame() 
 
-# Camera view
+# camera view
 ps.look_at(
     camera_location=(1.7, -1.7, 1.2),  
     target=(0.0, 0.0, 0.2)             

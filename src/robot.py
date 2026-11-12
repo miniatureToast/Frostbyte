@@ -3,16 +3,16 @@ import trimesh
 from . import config
 
 def build_plow(scene):
-    # Automatically find the lowest Z vertex of the .obj so it never spawns inside the floor
+    # resets z-pos to lowest point of obj
     mesh = trimesh.load(config.PLOW_FILE, force="mesh")
     min_z = float(mesh.bounds[0][2])
-    
-    # Shift spawn Z so the bottom of the mesh sits 2mm above Z = 0.0
     spawn_pos = (
         config.PLOW_POS[0],
         config.PLOW_POS[1],
         -min_z + 0.002,
     )
+
+    # load obj file
     if config.PLOW_FILE.endswith(".urdf"):
         robot_morph = gs.morphs.URDF(
             file=config.PLOW_FILE,
@@ -29,7 +29,7 @@ def build_plow(scene):
             scale=1.0, 
             collision=True, 
         )
-
+    
     plow = scene.add_entity(
         material=gs.materials.Rigid(
             rho=config.PLOW_DENSITY, 
