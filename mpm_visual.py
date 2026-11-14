@@ -6,6 +6,7 @@ import open3d as o3d
 import pandas as pd 
 import numpy as np
 import trimesh
+import imageio.v2 as imageio
 
 ps.init()
 ps.set_up_dir("z_up")
@@ -89,7 +90,7 @@ update_frame()
 
 # camera view
 ps.look_at(
-    camera_location=(1.7, -1.7, 1.2),  
+    camera_location=(3, -3, 1.8),  
     target=(0.0, 0.0, 0.2)             
 )
 
